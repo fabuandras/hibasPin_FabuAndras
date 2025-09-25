@@ -1,19 +1,22 @@
 package main;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 public class PinBekero extends javax.swing.JFrame {
 
     private static int kattDb = 0;
     private static boolean mentve = false;
     private static String pin = "";
-    
+
     public PinBekero() {
         initComponents();
+        chbMutat.setEnabled(true);
     }
 
     /**
@@ -112,40 +115,42 @@ public class PinBekero extends javax.swing.JFrame {
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         for (int i = 0; i < jPanel1.getComponentCount(); i++) {
-            JButton btn = (JButton) jPanel1.getComponent(i);
-            btn.setText(i + "");
-            btn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (kattDb <= 4) {
-                        kattDb++;
-                        pin += e.getActionCommand();
-                    } 
-                    if(kattDb == 4) {
-                        chbMutat.setEnabled(true);
-                        JOptionPane.showMessageDialog(rootPane, "Pin mentve!");
-                    }
-                    
-                }
-            });
+            Component c = jPanel1.getComponent(i);
+            if (c instanceof JButton) {
+                JButton btn = (JButton) c;
+                btn.setText(String.valueOf(i));
+                btn.setActionCommand(String.valueOf(i));
+                btn.addActionListener((ActionEvent e) -> gombMegnyomva(e));
+            }
         }
     }//GEN-LAST:event_formWindowOpened
 
     private void chbMutatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chbMutatActionPerformed
-        if(chbMutat.isSelected()){
-            for (int i = 0; i < pin.length(); i++) {
-                int gomb = Integer.parseInt(pin.charAt(i)+"");
-                jPanel1.getComponent(gomb).setBackground(Color.red);
-            }
-        }else{
-            chbMutat.setEnabled(false);
-            kattDb = 0;
-            for (int i = 0; i < pin.length(); i++) {
-                int gomb = Integer.parseInt(pin.charAt(i)+"");
-                jPanel1.getComponent(gomb).setBackground(Color.LIGHT_GRAY);
-            }
-        }
+        pinGombokMutat(chbMutat.isSelected());
     }//GEN-LAST:event_chbMutatActionPerformed
+
+    private void gombMegnyomva(ActionEvent e) {
+        if (kattDb < 4) {
+            kattDb++;
+            pin += e.getActionCommand();
+        }
+        if (kattDb == 4 && !mentve) {
+            mentve = true;
+            JOptionPane.showMessageDialog(this, "Pin mentve!");
+        }
+    }
+
+    private void pinGombokMutat(boolean mutat) {
+        Color alapSzín = UIManager.getColor("Button.background");
+        for (int i = 0; i < pin.length(); i++) {
+            int idx = Integer.parseInt(String.valueOf(pin.charAt(i)));
+            JButton btn = (JButton) jPanel1.getComponent(idx);
+            btn.setBackground(mutat ? Color.RED : alapSzín);
+            btn.setOpaque(true);
+            btn.setBorderPainted(true);
+        }
+        //chbMutat.setEnabled(false);
+    }
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
