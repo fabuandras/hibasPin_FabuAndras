@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+import modell.PinModel;
 
 public class PinBekero extends javax.swing.JFrame {
 
@@ -14,6 +15,8 @@ public class PinBekero extends javax.swing.JFrame {
     private static boolean mentve = false;
     private static String pin = "";
 
+    private PinModel model = new PinModel();
+    
     public PinBekero() {
         initComponents();
         chbMutat.setEnabled(true);
@@ -125,23 +128,26 @@ public class PinBekero extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_formWindowOpened
 
+    private void gombMegnyomva(ActionEvent e) {
+        int szam = Integer.parseInt(e.getActionCommand());
+        model.gombMegnyomva(szam);
+        if (model.getPin().length() == 4 && !model.isMentve()) {
+            try {
+                model.ment();
+                JOptionPane.showMessageDialog(this, "Pin mentve a pin.txt fájlba!");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Hiba a mentés során: " + ex.getMessage());
+            }
+        }
+    }
+    
     private void chbMutatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chbMutatActionPerformed
         pinGombokMutat(chbMutat.isSelected());
     }//GEN-LAST:event_chbMutatActionPerformed
 
-    private void gombMegnyomva(ActionEvent e) {
-        if (kattDb < 4) {
-            kattDb++;
-            pin += e.getActionCommand();
-        }
-        if (kattDb == 4 && !mentve) {
-            mentve = true;
-            JOptionPane.showMessageDialog(this, "Pin mentve!");
-        }
-    }
-
     private void pinGombokMutat(boolean mutat) {
         Color alapSzín = UIManager.getColor("Button.background");
+        String pin = model.getPin();
         for (int i = 0; i < pin.length(); i++) {
             int idx = Integer.parseInt(String.valueOf(pin.charAt(i)));
             JButton btn = (JButton) jPanel1.getComponent(idx);
@@ -149,7 +155,6 @@ public class PinBekero extends javax.swing.JFrame {
             btn.setOpaque(true);
             btn.setBorderPainted(true);
         }
-        //chbMutat.setEnabled(false);
     }
 
     public static void main(String args[]) {
